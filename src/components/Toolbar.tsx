@@ -10,6 +10,7 @@ interface ToolbarProps {
   pxPerSec: number;
   hasSubs: boolean;
   hasSelection: boolean;
+  showMerge: boolean;
   onImportSrt: (file: File) => void;
   onImportVideo: (file: File) => void;
   onLoadSample: () => void;
@@ -20,6 +21,7 @@ interface ToolbarProps {
   onToggleFollow: (v: boolean) => void;
   onZoom: (v: number) => void;
   onDeleteSelected: () => void;
+  onToggleMerge: () => void;
 }
 
 export default function Toolbar(props: ToolbarProps) {
@@ -80,6 +82,14 @@ export default function Toolbar(props: ToolbarProps) {
           title="Delete"
         >
           🗑 删除选中
+        </button>
+        <button
+          className={`btn ${props.showMerge ? 'primary' : ''}`}
+          disabled={!props.hasSubs}
+          onClick={props.onToggleMerge}
+          title={props.hasSubs ? '打开修订稿合并侧栏' : '请先导入当前字幕'}
+        >
+          📚 修订稿合并
         </button>
       </div>
 

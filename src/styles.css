@@ -353,6 +353,252 @@ body {
 .badge-inverted { background: rgba(198, 120, 221, 0.18); color: var(--inverted); }
 .badge-short { background: rgba(245, 185, 66, 0.18); color: var(--short); }
 
+/* ---------- 修订稿合并侧栏 ---------- */
+.merge-panel {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.merge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.merge-title {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.merge-file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.merge-file .file-chip {
+  flex: 1;
+  min-width: 0;
+}
+
+.merge-clear {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.merge-clear:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.merge-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.merge-empty {
+  padding: 24px 10px;
+  text-align: center;
+  color: var(--text-dim);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.merge-summary {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  padding: 2px 2px 6px;
+}
+
+.merge-summary b {
+  color: var(--text);
+}
+
+.merge-pair {
+  background: var(--panel-2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 7px 9px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.merge-pair:hover {
+  border-color: var(--border);
+}
+
+.merge-pair.active {
+  border-color: var(--accent);
+}
+
+.merge-pair-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.merge-pair-idx {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.merge-score {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 0 7px;
+  border-radius: 10px;
+}
+
+.score-high {
+  background: rgba(52, 201, 142, 0.18);
+  color: var(--ok);
+}
+
+.score-mid {
+  background: rgba(245, 185, 66, 0.18);
+  color: var(--warn);
+}
+
+.score-low {
+  background: rgba(242, 85, 90, 0.18);
+  color: var(--danger);
+}
+
+.merge-side {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: 12px;
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.merge-side-tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  margin-top: 1px;
+}
+
+.merge-side-revision .merge-side-tag {
+  color: var(--ok);
+  border-color: rgba(52, 201, 142, 0.45);
+}
+
+.merge-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.merge-unmatched {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.merge-unmatched-title {
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 4px 2px 0;
+}
+
+.merge-unmatched-title.current {
+  color: var(--text-dim);
+}
+
+.merge-unmatched-title.revision {
+  color: var(--warn);
+}
+
+.merge-unmatched-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 9px;
+  background: var(--panel-2);
+  border-left: 3px solid var(--border);
+  border-radius: 4px;
+  font-size: 11px;
+  text-align: left;
+}
+
+.merge-unmatched-row.current {
+  cursor: pointer;
+}
+
+.merge-unmatched-row.current:hover {
+  background: #26314a;
+}
+
+.merge-unmatched-row.active {
+  border-left-color: var(--accent);
+}
+
+.merge-unmatched-row.revision {
+  border-left-color: rgba(245, 185, 66, 0.55);
+}
+
+.merge-idx {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.merge-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.merge-footer .btn {
+  width: 100%;
+}
+
 /* ---------- 时间轴 ---------- */
 .timeline-wrap {
   flex-shrink: 0;

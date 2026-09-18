@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useDeferredValue, useMemo, useRef, useState } from 'react';
 import type { Subtitle } from './types';
 import { parseSrt, serializeSrt } from './srt';
 import { detectIssues } from './issues';
+import { alignSubtitles, applyMerge } from './merge';
 import { SAMPLE_SRT } from './sample';
 import { useWaveform } from './useWaveform';
 import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
 import Timeline from './components/Timeline';
 import IssuesPanel from './components/IssuesPanel';
+import RevisionMergePanel from './components/RevisionMergePanel';
 import './styles.css';
 
 interface History {
@@ -31,10 +33,23 @@ export default function App() {
   const [follow, setFollow] = useState(true);
   const [pxPerSec, setPxPerSec] = useState(80);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showMerge, setShowMerge] = useState(false);
+  // 修订稿独立于当前字幕保存：导入不会替换当前时间轴
+  const [revision, setRevision] = useState<Subtitle[]>([]);
+  const [revisionName, setRevisionName] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const { waveform, loadWaveform, dismissWaveform } = useWaveform();
 
   const issues = useMemo(() => detectIssues(subs), [subs]);
+
+  // 对齐计算较重（大文件毫秒到秒级），用 deferred 值避免拖动字幕时的高频更新阻塞交互；
+  // 应用合并（applyRevision）始终基于 history.present 即时重算，不受延迟影响。
+  const deferredSubs = useDeferredValue(subs);
+  const deferredRevision = useDeferredValue(revision);
+  const mergeResult = useMemo(
+    () => (deferredRevision.length > 0 ? alignSubtitles(deferredSubs, deferredRevision) : null),
+    [deferredSubs, deferredRevision]
+  );
 
   // ---- 历史操作 ----
   /** 拖动结束：把拖动前快照压入历史（present 已在拖动过程中实时更新） */
@@ -77,12 +92,44 @@ export default function App() {
     setSrtName(name);
     setSelectedId(null);
     setCurrentTime(0);
+    // 新字幕载入后，旧修订稿的匹配已失效，一并清空
+    setRevision([]);
+    setRevisionName('');
   }, []);
 
   const importSrt = useCallback(
     async (file: File) => loadSrt(await file.text(), file.name),
     [loadSrt]
   );
+
+  const importRevision = useCallback(
+    async (file: File) => {
+      const parsed = parseSrt(await file.text());
+      setRevision(parsed);
+      setRevisionName(file.name);
+    },
+    []
+  );
+
+  const clearRevision = useCallback(() => {
+    setRevision([]);
+    setRevisionName('');
+  }, []);
+
+  // 应用修订稿合并：仅已匹配条目的文本写回当前字幕，id / 序号 / 时间保留，
+  // 整批作为一次撤销/重做操作
+  const applyRevision = useCallback(() => {
+    setHistory((h) => {
+      if (revision.length === 0) return h;
+      const result = alignSubtitles(h.present, revision);
+      if (result.pairs.length === 0) return h;
+      return {
+        past: [...h.past, h.present],
+        present: applyMerge(h.present, revision, result),
+        future: [],
+      };
+    });
+  }, [revision]);
 
   const importVideo = useCallback(
     (file: File) => {
@@ -172,6 +219,7 @@ export default function App() {
         pxPerSec={pxPerSec}
         hasSubs={subs.length > 0}
         hasSelection={selectedId !== null}
+        showMerge={showMerge}
         onImportSrt={importSrt}
         onImportVideo={importVideo}
         onLoadSample={loadSample}
@@ -182,6 +230,7 @@ export default function App() {
         onToggleFollow={setFollow}
         onZoom={setPxPerSec}
         onDeleteSelected={deleteSelected}
+        onToggleMerge={() => setShowMerge((v) => !v)}
       />
 
       <main className="main">
@@ -194,6 +243,19 @@ export default function App() {
             onDuration={setVideoDuration}
           />
           <IssuesPanel subs={subs} issues={issues} selectedId={selectedId} onJump={jumpTo} />
+          {showMerge && (
+            <RevisionMergePanel
+              subs={subs}
+              revision={revision}
+              revisionName={revisionName}
+              result={mergeResult}
+              selectedId={selectedId}
+              onImportRevision={importRevision}
+              onApply={applyRevision}
+              onClear={clearRevision}
+              onJump={jumpTo}
+            />
+          )}
         </section>
 
         <Timeline
