@@ -652,3 +652,210 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* ---------- 修订稿合并侧栏 ---------- */
+.merge-panel {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.merge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.merge-title {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.merge-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn.mini {
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+.merge-file {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.merge-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.merge-empty {
+  padding: 20px 10px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.merge-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: var(--panel-2);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.merge-pair:hover {
+  border-color: var(--border);
+}
+
+.merge-pair-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.merge-pair-idx {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.merge-score {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.score-high {
+  background: rgba(52, 201, 142, 0.18);
+  color: var(--ok);
+}
+
+.score-mid {
+  background: rgba(79, 140, 255, 0.18);
+  color: var(--accent);
+}
+
+.score-low {
+  background: rgba(245, 185, 66, 0.18);
+  color: var(--short);
+}
+
+.merge-text {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.merge-text-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 17px;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: #2a3550;
+  color: var(--text-dim);
+}
+
+.merge-text-revision .merge-text-label {
+  background: rgba(52, 201, 142, 0.22);
+  color: var(--ok);
+}
+
+.merge-text-body {
+  white-space: pre-line;
+  min-width: 0;
+}
+
+.merge-sub-scores {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.merge-detail {
+  white-space: nowrap;
+}
+
+.merge-unmatched {
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+  padding-top: 6px;
+}
+
+.merge-unmatched-title {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 4px 2px;
+}
+
+.merge-unmatched-row {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  margin-bottom: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--text-dim);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button.merge-unmatched-row:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.merge-unmatched-row.revision {
+  cursor: default;
+}
+
+.merge-footer {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.merge-footer .btn {
+  width: 100%;
+}

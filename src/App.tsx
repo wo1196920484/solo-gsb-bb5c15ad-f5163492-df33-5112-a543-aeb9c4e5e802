@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Subtitle } from './types';
 import { parseSrt, serializeSrt } from './srt';
 import { detectIssues } from './issues';
+import { alignSubtitles } from './merge';
 import { SAMPLE_SRT } from './sample';
 import { useWaveform } from './useWaveform';
 import Toolbar from './components/Toolbar';
 import VideoPlayer from './components/VideoPlayer';
 import Timeline from './components/Timeline';
 import IssuesPanel from './components/IssuesPanel';
+import RevisionMergePanel from './components/RevisionMergePanel';
 import './styles.css';
 
 interface History {
@@ -23,6 +25,8 @@ export default function App() {
   const subs = history.present;
 
   const [srtName, setSrtName] = useState('');
+  const [revision, setRevision] = useState<Subtitle[] | null>(null);
+  const [revisionName, setRevisionName] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [videoName, setVideoName] = useState('');
   const [currentTime, setCurrentTime] = useState(0); // 秒
@@ -35,6 +39,12 @@ export default function App() {
   const { waveform, loadWaveform, dismissWaveform } = useWaveform();
 
   const issues = useMemo(() => detectIssues(subs), [subs]);
+
+  // 修订稿对齐结果：随当前字幕与修订稿实时重算
+  const mergeResult = useMemo(
+    () => (revision ? alignSubtitles(subs, revision) : null),
+    [subs, revision]
+  );
 
   // ---- 历史操作 ----
   /** 拖动结束：把拖动前快照压入历史（present 已在拖动过程中实时更新） */
@@ -75,6 +85,8 @@ export default function App() {
     const parsed = parseSrt(content);
     setHistory({ past: [], present: parsed, future: [] });
     setSrtName(name);
+    setRevision(null); // 新主字幕载入时清掉旧修订稿
+    setRevisionName('');
     setSelectedId(null);
     setCurrentTime(0);
   }, []);
@@ -83,6 +95,37 @@ export default function App() {
     async (file: File) => loadSrt(await file.text(), file.name),
     [loadSrt]
   );
+
+  // 导入修订稿：仅解析保存用于对齐，不触碰当前时间轴
+  const importRevision = useCallback(async (file: File) => {
+    setRevision(parseSrt(await file.text()));
+    setRevisionName(file.name);
+  }, []);
+
+  const clearRevision = useCallback(() => {
+    setRevision(null);
+    setRevisionName('');
+  }, []);
+
+  // 应用匹配：只把已匹配的修订文本写回，保留 id / index / 时间；整批一次撤销/重做
+  const applyMerge = useCallback(() => {
+    if (!mergeResult) return;
+    setHistory((h) => {
+      const next = h.present.map((s) => ({ ...s }));
+      let changed = false;
+      for (const p of mergeResult.pairs) {
+        const target = next[p.currentIndex];
+        const newText = revision![p.revisionIndex].text;
+        if (target && target.text !== newText) {
+          target.text = newText;
+          changed = true;
+        }
+      }
+      return changed
+        ? { past: [...h.past, h.present], present: next, future: [] }
+        : h;
+    });
+  }, [mergeResult, revision]);
 
   const importVideo = useCallback(
     (file: File) => {
@@ -194,6 +237,16 @@ export default function App() {
             onDuration={setVideoDuration}
           />
           <IssuesPanel subs={subs} issues={issues} selectedId={selectedId} onJump={jumpTo} />
+          <RevisionMergePanel
+            current={subs}
+            revision={revision}
+            revisionName={revisionName}
+            result={mergeResult}
+            onImportRevision={importRevision}
+            onClearRevision={clearRevision}
+            onApply={applyMerge}
+            onJump={jumpTo}
+          />
         </section>
 
         <Timeline
